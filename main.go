@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"image/color"
 	"log"
 	"time"
 
@@ -13,11 +12,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//go:embed assets/rectSprite.png
+//go:embed assets/enemies/rectSprite.png
 var rectSpriteBytes []byte
 var rectSpriteImg *ebiten.Image
 
-//go:embed assets/circSprite.png
+//go:embed assets/enemies/circSprite.png
 var circleSpriteBytes []byte
 var circleSpriteImg *ebiten.Image
 
@@ -36,11 +35,23 @@ func main() {
 		utils.Position{X: 100, Y: 100},
 	)
 	rect := shapes.NewRect(
-		15, 15, color.RGBA{0xFF, 0, 0, 0xFF}, 100, curMap.StartPos, curMap.Path[1], rectSpriteImg,
+		15,
+		100,
+		curMap.StartPos,
+		curMap.Path[1],
+		rectSpriteImg,
+		100,
+		100,
 	)
 
 	circ := shapes.NewCircle(
-		15, color.RGBA{0, 0xFF, 0, 0xFF}, 200, curMap.StartPos, curMap.Path[1], circleSpriteImg,
+		15,
+		200,
+		curMap.StartPos,
+		curMap.Path[1],
+		circleSpriteImg,
+		130,
+		130,
 	)
 
 	curMap.AppendShapes(rect, circ)

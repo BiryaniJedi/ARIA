@@ -20,4 +20,8 @@ type Shape interface {
 	SetTarget(utils.Position)
 	RotateToTarget(utils.Position)
 	GetRotation() float64
+	GetCurHp() int32
+	TakeDamage(uint32) int32
+	HealHP(uint32) int32
+	GetRadius() float32
 }

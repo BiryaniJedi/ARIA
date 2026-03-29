@@ -54,3 +54,7 @@ func DrawSprite(screen, sprite *ebiten.Image, pos Position, angle float64) {
 	op.GeoM.Translate(float64(pos.X), float64(pos.Y))
 	screen.DrawImage(sprite, op)
 }
+
+func CirclesIntersect(pos1 Position, rad1 float32, pos2 Position, rad2 float32) bool {
+	return Distance(pos1, pos2) <= rad1+rad2
+}

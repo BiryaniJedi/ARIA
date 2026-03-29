@@ -4,31 +4,60 @@ import (
 	"github.com/BiryaniJedi/ARIA/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 	// "github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
 )
 
 type Rect struct {
 	pos      utils.Position
-	width    float32
-	height   float32
-	color    color.Color
-	progress int
-	speed    float32 // per second
 	target   utils.Position
 	sprite   *ebiten.Image
 	rotation float64
+	progress int
+	maxHp    int32
+	curHp    int32
+	radius   float32
+	speed    float32 // per second
+}
+
+func NewRect(
+	radius, speed float32,
+	pos, target utils.Position,
+	sprite *ebiten.Image,
+	maxHp int32,
+	curHp int32,
+) *Rect {
+	ret := &Rect{
+		pos,
+		target,
+		sprite,
+		0,
+		0,
+		maxHp,
+		curHp,
+		radius,
+		speed,
+	}
+	ret.RotateToTarget(ret.target)
+	return ret
 }
 
 func (r *Rect) Draw(screen *ebiten.Image) {
 	utils.DrawSprite(screen, r.sprite, r.pos, r.rotation)
 }
 
-func (r *Rect) GetCurPos() utils.Position               { return r.pos }
-func (r *Rect) GetProgress() int                        { return r.progress }
-func (r *Rect) IncProgress()                            { r.progress++ }
-func (r *Rect) ResetProgress()                          { r.progress = 0 }
-func (r *Rect) GetSpeed() float32                       { return r.speed }
-func (r *Rect) GetRotation() float64                    { return r.rotation }
+func (r *Rect) GetCurPos() utils.Position { return r.pos }
+
+func (r *Rect) GetRadius() float32 {
+	return r.radius
+}
+
+func (r *Rect) GetProgress() int { return r.progress }
+func (r *Rect) IncProgress()     { r.progress++ }
+func (r *Rect) ResetProgress()   { r.progress = 0 }
+
+func (r *Rect) GetSpeed() float32 { return r.speed }
+
+func (r *Rect) GetRotation() float64 { return r.rotation }
+
 func (r *Rect) SetTarget(newPos utils.Position)         { r.target = newPos }
 func (r *Rect) RotateToTarget(targetPos utils.Position) { r.rotation = r.pos.AngleToPos(targetPos) }
 
@@ -48,24 +77,12 @@ func (r *Rect) SeekTarget(toMove float32) bool {
 	return false
 }
 
-func NewRect(
-	width, height float32,
-	color color.Color,
-	speed float32,
-	pos, target utils.Position,
-	sprite *ebiten.Image,
-) *Rect {
-	ret := &Rect{
-		pos,
-		width,
-		height,
-		color,
-		0,
-		speed,
-		target,
-		sprite,
-		0,
-	}
-	ret.RotateToTarget(ret.target)
-	return ret
+func (r *Rect) GetCurHp() int32 { return r.curHp }
+func (r *Rect) TakeDamage(damage uint32) int32 {
+	r.curHp -= int32(damage)
+	return r.curHp
+}
+func (r *Rect) HealHP(healing uint32) int32 {
+	r.curHp += int32(healing)
+	return r.curHp
 }
