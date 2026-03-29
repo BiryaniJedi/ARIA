@@ -1,40 +1,47 @@
 package main
 
 import (
-	"github.com/BiryaniJedi/ARIA/game"
-	"github.com/BiryaniJedi/ARIA/maps"
-	"github.com/BiryaniJedi/ARIA/shapes"
-	"github.com/hajimehoshi/ebiten/v2"
+	_ "embed"
 	"image/color"
 	"log"
 	"time"
+
+	"github.com/BiryaniJedi/ARIA/game"
+	"github.com/BiryaniJedi/ARIA/maps"
+	"github.com/BiryaniJedi/ARIA/shapes"
+	"github.com/BiryaniJedi/ARIA/utils"
+	"github.com/hajimehoshi/ebiten/v2"
 )
+
+//go:embed assets/rectSprite.png
+var rectSpriteBytes []byte
+var rectSpriteImg *ebiten.Image
+
+//go:embed assets/circSprite.png
+var circleSpriteBytes []byte
+var circleSpriteImg *ebiten.Image
+
+func init() {
+	rectSpriteImg = utils.LoadSprite(rectSpriteBytes)
+	circleSpriteImg = utils.LoadSprite(circleSpriteBytes)
+}
 
 func main() {
 	curMap := maps.NewMap(300, 400)
 	curMap.AppendPositions(
-		shapes.Position{X: 600, Y: 400},
-		shapes.Position{X: 300, Y: 0},
-		shapes.Position{X: 300, Y: 400},
-		shapes.Position{X: 500, Y: 599},
-		shapes.Position{X: 100, Y: 100},
+		utils.Position{X: 600, Y: 400},
+		utils.Position{X: 300, Y: 0},
+		utils.Position{X: 300, Y: 400},
+		utils.Position{X: 500, Y: 599},
+		utils.Position{X: 100, Y: 100},
+	)
+	rect := shapes.NewRect(
+		15, 15, color.RGBA{0xFF, 0, 0, 0xFF}, 100, curMap.StartPos, curMap.Path[1], rectSpriteImg,
 	)
 
-	rect := &shapes.Rect{
-		Pos:    curMap.StartPos,
-		Width:  15,
-		Height: 15,
-		Color:  color.RGBA{0xFF, 0, 0, 0xFF},
-		Speed:  100,
-		Target: curMap.Path[1],
-	}
-	circ := &shapes.Circle{
-		CenterPos: curMap.StartPos,
-		Radius:    15,
-		Color:     color.RGBA{0, 0xFF, 0, 0xFF},
-		Speed:     200,
-		Target:    curMap.Path[1],
-	}
+	circ := shapes.NewCircle(
+		15, color.RGBA{0, 0xFF, 0, 0xFF}, 200, curMap.StartPos, curMap.Path[1], circleSpriteImg,
+	)
 
 	curMap.AppendShapes(rect, circ)
 

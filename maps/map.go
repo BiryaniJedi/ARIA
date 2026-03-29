@@ -5,21 +5,22 @@ import (
 	"image/color"
 
 	"github.com/BiryaniJedi/ARIA/shapes"
+	"github.com/BiryaniJedi/ARIA/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type Map struct {
 	Shapes   []shapes.Shape
-	Path     []shapes.Position
-	StartPos shapes.Position
+	Path     []utils.Position
+	StartPos utils.Position
 }
 
 func NewMap(initX, initY float32) *Map {
-	initPos := shapes.Position{X: initX, Y: initY}
+	initPos := utils.Position{X: initX, Y: initY}
 	return &Map{
 		StartPos: initPos,
-		Path:     []shapes.Position{initPos},
+		Path:     []utils.Position{initPos},
 	}
 }
 
@@ -32,7 +33,7 @@ func (m *Map) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (m *Map) AppendPositions(positions ...shapes.Position) {
+func (m *Map) AppendPositions(positions ...utils.Position) {
 	m.Path = append(m.Path, positions...)
 }
 
