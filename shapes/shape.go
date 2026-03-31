@@ -5,10 +5,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-const (
-	EPSILON float32 = 1e-4
-)
-
 type Shape interface {
 	Draw(*ebiten.Image)
 	GetCurPos() utils.Position
@@ -24,4 +20,13 @@ type Shape interface {
 	TakeDamage(uint32) int32
 	HealHP(uint32) int32
 	GetRadius() float32
+}
+
+// returns pointer to the furthest shape in the given slice
+// returns nil if there was no max (given slice empty)
+func GetFurthestShape(shapes []Shape) (int, *Shape) {
+	idx, furthestPtr := utils.Max(shapes, func(shape Shape) int {
+		return shape.GetProgress()
+	})
+	return idx, furthestPtr
 }

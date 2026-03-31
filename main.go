@@ -8,6 +8,7 @@ import (
 	"github.com/BiryaniJedi/ARIA/game"
 	"github.com/BiryaniJedi/ARIA/maps"
 	"github.com/BiryaniJedi/ARIA/shapes"
+	"github.com/BiryaniJedi/ARIA/towers"
 	"github.com/BiryaniJedi/ARIA/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -36,7 +37,7 @@ func main() {
 	)
 	rect := shapes.NewRect(
 		15,
-		100,
+		40,
 		curMap.StartPos,
 		curMap.Path[1],
 		rectSpriteImg,
@@ -46,13 +47,16 @@ func main() {
 
 	circ := shapes.NewCircle(
 		15,
-		200,
+		55,
 		curMap.StartPos,
 		curMap.Path[1],
 		circleSpriteImg,
 		130,
 		130,
 	)
+
+	guy := towers.NewD1Commit(utils.Position{X: 450, Y: 200}, 600, 2)
+	curMap.PushTower(guy)
 
 	curMap.AppendShapes(rect, circ)
 
@@ -62,7 +66,7 @@ func main() {
 		CurMap:    curMap,
 	}
 
-	ebiten.SetWindowSize(1280, 720)
+	ebiten.SetWindowSize(utils.SCREEN_WIDTH, utils.SCREEN_HEIGHT)
 	ebiten.SetWindowTitle("ARIA")
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

@@ -66,7 +66,7 @@ func (c *Circle) RotateToTarget(targetPos utils.Position) {
 // Returns true if the rectangle has reached the target position
 func (c *Circle) SeekTarget(toMove float32) bool {
 	toTarget := utils.Distance(c.Pos, c.Target)
-	if toTarget < EPSILON || toMove >= toTarget {
+	if toTarget < utils.EPSILON || toMove >= toTarget {
 		c.Pos = c.Target
 		return true
 	}

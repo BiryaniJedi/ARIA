@@ -64,7 +64,7 @@ func (r *Rect) RotateToTarget(targetPos utils.Position) { r.rotation = r.pos.Ang
 // Returns true if the rectangle has reached the target position
 func (r *Rect) SeekTarget(toMove float32) bool {
 	toTarget := utils.Distance(r.pos, r.target)
-	if toTarget < EPSILON || toMove >= toTarget {
+	if toTarget < utils.EPSILON || toMove >= toTarget {
 		r.pos = r.target
 		return true
 	}
