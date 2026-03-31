@@ -76,7 +76,7 @@ func CirclesIntersect(pos1 Position, rad1 float32, pos2 Position, rad2 float32) 
 	return Distance(pos1, pos2) <= rad1+rad2
 }
 
-// Generic functional style Filter function. return length of filtered slice
+// Generic functional style Filter function.
 func Filter[T any](xs []T, fn func(T) bool) []T {
 	ret := []T{}
 	for _, x := range xs {
@@ -102,4 +102,13 @@ func Max[T any, E cmp.Ordered](xs []T, fn func(T) E) (int, *T) {
 		}
 	}
 	return curMaxIdx, &(xs[curMaxIdx])
+}
+
+// Generic functional style Map function.
+func Map[T any, E any](xs []T, fn func(T) E) []E {
+	ret := []E{}
+	for _, x := range xs {
+		ret = append(ret, fn(x))
+	}
+	return ret
 }

@@ -4,6 +4,7 @@ import (
 	// "github.com/BiryaniJedi/ARIA/game"
 	"fmt"
 	"image/color"
+	"slices"
 
 	"github.com/BiryaniJedi/ARIA/shapes"
 	"github.com/BiryaniJedi/ARIA/towers"
@@ -83,4 +84,36 @@ func (m *Map) PushTower(tower towers.Tower) {
 func (m *Map) PushProjectilePtr(towerPtr *towers.Tower, projPtr *towers.Projectile) {
 	m.Projectiles[towerPtr] = append(m.Projectiles[towerPtr], projPtr)
 	// m.PrintProjsForTower(towerPtr)
+}
+
+// returns true if shape existed before and was deleted, false if shape didn't exist
+func (m *Map) DeleteShapeByPointer(targetShapePtr *shapes.Shape) bool {
+	if len(m.Shapes) == 0 {
+		return false
+	}
+	n := len(m.Shapes) - 1
+	for i := n; i >= 0; i-- {
+		curShapePtr := &(m.Shapes[i])
+		if curShapePtr == targetShapePtr {
+			m.Shapes = slices.Delete(m.Shapes, i, i+1)
+			return true
+		}
+	}
+	return false
+}
+
+func (m *Map) DeleteProjectileByPointer(towerPtr *towers.Tower, targetProjPtr *towers.Projectile) bool {
+	projPtrs, ok := m.Projectiles[towerPtr]
+	if !ok || len(projPtrs) == 0 {
+		return false
+	}
+	n := len(projPtrs) - 1
+	for i := n; i >= 0; i-- {
+		curProjPtr := projPtrs[i]
+		if curProjPtr == targetProjPtr {
+			m.Projectiles[towerPtr] = slices.Delete(m.Projectiles[towerPtr], i, i+1)
+			return true
+		}
+	}
+	return false
 }

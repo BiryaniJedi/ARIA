@@ -1,7 +1,7 @@
 package towers
 
 import (
-	// "github.com/BiryaniJedi/ARIA/shapes"
+	"github.com/BiryaniJedi/ARIA/shapes"
 	// "github.com/BiryaniJedi/ARIA/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -15,6 +15,7 @@ const (
 
 type Projectile interface {
 	Draw(*ebiten.Image)
+	GetDamage() uint32
 	GetDefaultVelo() int32
 	GetCurVelo() int32
 	SetVelo(int32)
@@ -24,8 +25,11 @@ type Projectile interface {
 	// Returns false if the projectile needs to be despawned for
 	// whatever reason (projectile will handle)
 	NextPos(float32) bool
+	GetShapePtrsInRange(*[]shapes.Shape) []*shapes.Shape
 }
 
 type Ball interface {
 	GetMaxHits() *uint32
+	GetHitsRemaining() *uint32
+	TakeHit()
 }

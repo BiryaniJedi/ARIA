@@ -1,7 +1,7 @@
 package game
 
 import (
-	// "fmt"
+	"fmt"
 	"image/color"
 	"time"
 
@@ -29,7 +29,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{230, 185, 190, 255})
+	screen.Fill(color.RGBA{35, 171, 25, 1})
 	g.CurMap.Draw(screen)
 }
 
@@ -71,6 +71,9 @@ func (g *Game) fireTowerAt(towerPtr *towers.Tower, targetShapePtr *shapes.Shape)
 	//Appends a new projectile (of the appropriate type given the tower) to the map's projectile CurMap
 	// and updates the lastshotTime of the tower
 	newProj := (*towerPtr).GetNewProjPtr(targetShapePtr)
+	if newProj == nil {
+		return
+	}
 	g.CurMap.PushProjectilePtr(towerPtr, &newProj)
 	(*towerPtr).UpdateLastShotTime()
 	// g.CurMap.PrintProjsForTower(towerPtr)
@@ -78,17 +81,17 @@ func (g *Game) fireTowerAt(towerPtr *towers.Tower, targetShapePtr *shapes.Shape)
 }
 
 func (g *Game) updateTowers(deltaTime time.Duration) {
-	towers := &(g.CurMap.Towers)
-	n := len(*towers) - 1
+	curTowers := &(g.CurMap.Towers)
+	n := len(*curTowers) - 1
 	for i := n; i >= 0; i-- {
-		curTowerPtr := ((*towers)[i])
+		curTowerPtr := ((*curTowers)[i])
 		curTowerPos := (*curTowerPtr).GetPos()
 		if (*curTowerPtr).IsDeleted() {
 			// TODO: Change from despawning projectiles on IsDeleted
 			// to something else (maybe checking if parent ptr is nil and deleting
 			// on reaching target)
 			delete(g.CurMap.Projectiles, curTowerPtr)
-			*towers = slices.Delete(*towers, i, i+1)
+			*curTowers = slices.Delete(*curTowers, i, i+1)
 			continue
 		}
 		withinRange := (*curTowerPtr).GetShapesInRange(&(g.CurMap.Shapes))
@@ -114,17 +117,49 @@ func (g *Game) updateTowers(deltaTime time.Duration) {
 			continue
 		}
 		numProjectiles := len(projPtrLst) - 1
-		for i := numProjectiles; i >= 0; i-- {
-			curProjPtr := projPtrLst[i]
+		for j := numProjectiles; j >= 0; j-- {
+			curProjPtr := projPtrLst[j]
 			if curProjPtr == nil {
 				continue
 			}
 			toMove := deltaTime.Seconds() * float64((*curProjPtr).GetCurVelo())
 			if validPos := (*curProjPtr).NextPos(float32(toMove)); !validPos {
 				//projectile needs to be despawned
-				g.CurMap.Projectiles[curTowerPtr] = slices.Delete(projPtrLst, i, i+1)
+				g.CurMap.Projectiles[curTowerPtr] = slices.Delete(projPtrLst, j, j+1)
 			}
 			// TODO: Collision Detection stuff
+			withinRangePtrs := (*curProjPtr).GetShapePtrsInRange(&(g.CurMap.Shapes))
+			numWithinRange := len(withinRangePtrs)
+
+			markedForDeletion := false
+			for k := range numWithinRange {
+				curPtr := withinRangePtrs[k]
+				(*curPtr).TakeDamage((*curProjPtr).GetDamage())
+
+				//switch on projectile type
+				switch val := (*curProjPtr).(type) {
+				case towers.Ball:
+					{
+						val.TakeHit()
+						hitsRemainingPtr := val.GetHitsRemaining()
+						if hitsRemainingPtr == nil {
+							break
+						}
+						fmt.Printf("HitsRemaining: %d\n", *hitsRemainingPtr)
+						if *hitsRemainingPtr <= 0 {
+							markedForDeletion = true
+						}
+					}
+				}
+
+				if markedForDeletion {
+					break
+				}
+			}
+
+			if markedForDeletion {
+				g.CurMap.Projectiles[curTowerPtr] = slices.Delete(projPtrLst, j, j+1)
+			}
 		}
 	}
 }

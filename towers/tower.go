@@ -5,6 +5,8 @@ import (
 	"github.com/BiryaniJedi/ARIA/shapes"
 	"github.com/BiryaniJedi/ARIA/utils"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
+	"image/color"
 	"time"
 )
 
@@ -27,6 +29,7 @@ type Tower interface {
 	ReadyToFire() bool
 	GetShapesInRange(*[]shapes.Shape) []shapes.Shape
 	GetNewProjPtr(*shapes.Shape) Projectile //
+	ToggleSelected()
 }
 
 type D1Commit struct {
@@ -36,6 +39,7 @@ type D1Commit struct {
 	angle          float64
 	targetingRange float32
 	aps            float32 // attacks per second
+	selected       bool
 }
 
 func NewD1Commit(pos utils.Position, radius float32, attacksPerSecond float32) *D1Commit {
@@ -45,11 +49,18 @@ func NewD1Commit(pos utils.Position, radius float32, attacksPerSecond float32) *
 		time.Now(),
 		0,
 		radius,
-		0.5,
+		2,
+		true,
 	}
 }
 
-func (dc *D1Commit) Draw(screen *ebiten.Image) { utils.DrawSprite(screen, dc.sprite, dc.pos, dc.angle) }
+func (dc *D1Commit) Draw(screen *ebiten.Image) {
+	if dc.selected {
+		// highlight range
+		vector.FillCircle(screen, dc.pos.X, dc.pos.Y, dc.targetingRange, color.RGBA{176, 176, 176, 1}, false)
+	}
+	utils.DrawSprite(screen, dc.sprite, dc.pos, dc.angle)
+}
 
 func (dc *D1Commit) GetPos() utils.Position    { return dc.pos }
 func (dc *D1Commit) GetAngle() float64         { return dc.angle }
@@ -60,15 +71,20 @@ func (dc *D1Commit) IsDeleted() bool { return false }
 func (dc *D1Commit) GetLastShotTime() time.Time { return dc.lastShotTime }
 func (dc *D1Commit) UpdateLastShotTime()        { dc.lastShotTime = time.Now() }
 
+func (dc *D1Commit) ToggleSelected() { dc.selected = !dc.selected }
+
 func (dc *D1Commit) GetNewProjPtr(targetShapePtr *shapes.Shape) Projectile {
-	return NewBaseball(dc, (*targetShapePtr).GetCurPos())
+	if targetShapePtr != nil {
+		return NewBaseball(dc, (*targetShapePtr).GetCurPos())
+	}
+	return nil
 }
 
 func (dc *D1Commit) ReadyToFire() bool {
 	if dc.aps < utils.EPSILON {
 		return false
 	}
-	return time.Since(dc.lastShotTime).Seconds() >= float64(dc.aps)
+	return time.Since(dc.lastShotTime).Seconds() >= (1 / float64(dc.aps))
 }
 
 // Filters the given list of shapes to only those whose circles intersect

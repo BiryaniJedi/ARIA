@@ -41,8 +41,8 @@ func main() {
 		curMap.StartPos,
 		curMap.Path[1],
 		rectSpriteImg,
-		100,
-		100,
+		500,
+		500,
 	)
 
 	circ := shapes.NewCircle(
@@ -51,11 +51,11 @@ func main() {
 		curMap.StartPos,
 		curMap.Path[1],
 		circleSpriteImg,
-		130,
-		130,
+		1000,
+		1000,
 	)
 
-	guy := towers.NewD1Commit(utils.Position{X: 450, Y: 200}, 600, 2)
+	guy := towers.NewD1Commit(utils.Position{X: 450, Y: 200}, 300, 2)
 	curMap.PushTower(guy)
 
 	curMap.AppendShapes(rect, circ)
